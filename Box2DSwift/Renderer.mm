@@ -90,14 +90,24 @@ enum
     auto currentTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastTime).count();
     lastTime = currentTime;
+    
+    // Update cascades down from here into box2D, every render update call will call box2d update
     [box2d Update:elapsedTime/1000.0f];
 
     // Get the ball and brick objects from Box2D
     auto objPosList = static_cast<std::map<const char *, b2Vec2> *>([box2d GetObjectPositions]);
+    
+    // GET BALL FROM BOX 2D
     b2Vec2 *theBall = (((*objPosList).find("ball") == (*objPosList).end()) ? nullptr : &(*objPosList)["ball"]);
-    b2Vec2 *theBrick = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
+    
+    // GET LEFT PADDLE FROM BOX 2D
+    b2Vec2 *paddleLeft = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
+    
+    // GET RIGHT PADDLE FROM BOX 2D
+    b2Vec2 *paddleRight = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
+    
 
-    if (theBrick)
+    if (paddleLeft)
     {
         // Set up VAO/VBO for brick
         glGenVertexArrays(1, &brickVertexArray);
@@ -110,28 +120,28 @@ enum
         GLfloat vertPos[18];    // 2 triangles x 3 vertices/triangle x 3 coords (x,y,z) per vertex
         int k = 0;
         numBrickVerts = 0;
-        vertPos[k++] = theBrick->x - BRICK_WIDTH/2;
-        vertPos[k++] = theBrick->y + BRICK_HEIGHT/2;
+        vertPos[k++] = paddleLeft->x - BRICK_WIDTH/2;
+        vertPos[k++] = paddleLeft->y + BRICK_HEIGHT/2;
         vertPos[k++] = 10;  // z-value is always set to same value since 2D
         numBrickVerts++;
-        vertPos[k++] = theBrick->x + BRICK_WIDTH/2;
-        vertPos[k++] = theBrick->y + BRICK_HEIGHT/2;
+        vertPos[k++] = paddleLeft->x + BRICK_WIDTH/2;
+        vertPos[k++] = paddleLeft->y + BRICK_HEIGHT/2;
         vertPos[k++] = 10;
         numBrickVerts++;
-        vertPos[k++] = theBrick->x + BRICK_WIDTH/2;
-        vertPos[k++] = theBrick->y - BRICK_HEIGHT/2;
+        vertPos[k++] = paddleLeft->x + BRICK_WIDTH/2;
+        vertPos[k++] = paddleLeft->y - BRICK_HEIGHT/2;
         vertPos[k++] = 10;
         numBrickVerts++;
-        vertPos[k++] = theBrick->x - BRICK_WIDTH/2;
-        vertPos[k++] = theBrick->y + BRICK_HEIGHT/2;
+        vertPos[k++] = paddleLeft->x - BRICK_WIDTH/2;
+        vertPos[k++] = paddleLeft->y + BRICK_HEIGHT/2;
         vertPos[k++] = 10;
         numBrickVerts++;
-        vertPos[k++] = theBrick->x + BRICK_WIDTH/2;
-        vertPos[k++] = theBrick->y - BRICK_HEIGHT/2;
+        vertPos[k++] = paddleLeft->x + BRICK_WIDTH/2;
+        vertPos[k++] = paddleLeft->y - BRICK_HEIGHT/2;
         vertPos[k++] = 10;
         numBrickVerts++;
-        vertPos[k++] = theBrick->x - BRICK_WIDTH/2;
-        vertPos[k++] = theBrick->y - BRICK_HEIGHT/2;
+        vertPos[k++] = paddleLeft->x - BRICK_WIDTH/2;
+        vertPos[k++] = paddleLeft->y - BRICK_HEIGHT/2;
         vertPos[k++] = 10;
         numBrickVerts++;
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos), vertPos, GL_STATIC_DRAW);    // Send vertex data to VBO
@@ -219,18 +229,11 @@ enum
     // Retrieve brick and ball positions from Box2D
     auto objPosList = static_cast<std::map<const char *, b2Vec2> *>([box2d GetObjectPositions]);
     b2Vec2 *theBall = (((*objPosList).find("ball") == (*objPosList).end()) ? nullptr : &(*objPosList)["ball"]);
-    b2Vec2 *theBrick = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
-#ifdef LOG_TO_CONSOLE
-    if (theBall)
-        printf("Ball: (%5.3f,%5.3f)\t", theBall->x, theBall->y);
-    if (theBrick)
-        printf("Brick: (%5.3f,%5.3f)", theBrick->x, theBrick->y);
-    printf("\n");
-#endif
+    b2Vec2 *paddleLeft = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
 
     // Bind each vertex array and call glDrawArrays for each of the ball and brick
     glBindVertexArray(brickVertexArray);
-    if (theBrick && numBrickVerts > 0)
+    if (paddleLeft && numBrickVerts > 0)
         glDrawArrays(GL_TRIANGLES, 0, numBrickVerts);
 
     glBindVertexArray(ballVertexArray);

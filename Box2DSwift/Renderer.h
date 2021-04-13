@@ -9,6 +9,7 @@
 
 @interface Renderer : NSObject
 
+// Create the colliders from here
 @property (strong, nonatomic) CBox2D *box2d;
 
 - (void)setup:(GLKView *)view;

@@ -50,7 +50,7 @@ public:
     b2BodyDef *groundBodyDef;
     b2Body *groundBody;
     b2PolygonShape *groundBox;
-    b2Body *theBrick, *theBall;
+    b2Body *paddleLeft, *paddleRight, *theBall;
     CContactListener *contactListener;
     float totalElapsedTime;
 
@@ -79,15 +79,19 @@ public:
         contactListener = new CContactListener();
         world->SetContactListener(contactListener);
         
-        // Set up the brick and ball objects for Box2D
-        b2BodyDef brickBodyDef;
-        brickBodyDef.type = b2_dynamicBody;
-        brickBodyDef.position.Set(BRICK_POS_X, BRICK_POS_Y);
-        theBrick = world->CreateBody(&brickBodyDef);
-        if (theBrick)
+        // Set up the bricks
+        b2BodyDef brickBodyDefLeft;
+        brickBodyDefLeft.type = b2_dynamicBody;
+        brickBodyDefLeft.position.Set(LEFT_BRICK_POS_X, LEFT_BRICK_POS_Y);
+        paddleLeft = world->CreateBody(&brickBodyDefLeft);
+        b2BodyDef brickBodyDefRight;
+        brickBodyDefRight.type = b2_dynamicBody;
+        brickBodyDefRight.position.Set(RIGHT_BRICK_POS_X, RIGHT_BRICK_POS_Y);
+        paddleRight = world->CreateBody(&brickBodyDefRight);
+        if (paddleLeft)
         {
-            theBrick->SetUserData((__bridge void *)self);
-            theBrick->SetAwake(false);
+            paddleLeft->SetUserData((__bridge void *)self);
+            //paddleLeft->SetAwake(false);
             b2PolygonShape dynamicBox;
             dynamicBox.SetAsBox(BRICK_WIDTH/2, BRICK_HEIGHT/2);
             b2FixtureDef fixtureDef;
@@ -95,26 +99,40 @@ public:
             fixtureDef.density = 1.0f;
             fixtureDef.friction = 0.3f;
             fixtureDef.restitution = 1.0f;
-            theBrick->CreateFixture(&fixtureDef);
-            
-            b2BodyDef ballBodyDef;
-            ballBodyDef.type = b2_dynamicBody;
-            ballBodyDef.position.Set(BALL_POS_X, BALL_POS_Y);
-            theBall = world->CreateBody(&ballBodyDef);
-            if (theBall)
-            {
-                theBall->SetUserData((__bridge void *)self);
-                theBall->SetAwake(false);
-                b2CircleShape circle;
-                circle.m_p.Set(0, 0);
-                circle.m_radius = BALL_RADIUS;
-                b2FixtureDef circleFixtureDef;
-                circleFixtureDef.shape = &circle;
-                circleFixtureDef.density = 1.0f;
-                circleFixtureDef.friction = 0.3f;
-                circleFixtureDef.restitution = 1.0f;
-                theBall->CreateFixture(&circleFixtureDef);
-            }
+            paddleLeft->CreateFixture(&fixtureDef);
+        }
+        if (paddleRight)
+        {
+            paddleRight->SetUserData((__bridge void *)self);
+            //paddleRight->SetAwake(false);
+            b2PolygonShape dynamicBox;
+            dynamicBox.SetAsBox(BRICK_WIDTH/2, BRICK_HEIGHT/2);
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &dynamicBox;
+            fixtureDef.density = 1.0f;
+            fixtureDef.friction = 0.3f;
+            fixtureDef.restitution = 1.0f;
+            paddleRight->CreateFixture(&fixtureDef);
+        }
+        
+        // Make the ball
+        b2BodyDef ballBodyDef;
+        ballBodyDef.type = b2_dynamicBody;
+        ballBodyDef.position.Set(BALL_POS_X, BALL_POS_Y);
+        theBall = world->CreateBody(&ballBodyDef);
+        if (theBall)
+        {
+            theBall->SetUserData((__bridge void *)self);
+            theBall->SetAwake(false);
+            b2CircleShape circle;
+            circle.m_p.Set(0, 0);
+            circle.m_radius = BALL_RADIUS;
+            b2FixtureDef circleFixtureDef;
+            circleFixtureDef.shape = &circle;
+            circleFixtureDef.density = 1.0f;
+            circleFixtureDef.friction = 0.3f;
+            circleFixtureDef.restitution = 1.0f;
+            theBall->CreateFixture(&circleFixtureDef);
         }
         
         totalElapsedTime = 0;
@@ -150,8 +168,8 @@ public:
     // Check if it is time yet to drop the brick, and if so
     //  call SetAwake()
     totalElapsedTime += elapsedTime;
-    if ((totalElapsedTime > BRICK_WAIT) && theBrick)
-        theBrick->SetAwake(true);
+    if ((totalElapsedTime > BRICK_WAIT) && paddleLeft)
+        paddleLeft->SetAwake(true);
     
     // If the last collision test was positive,
     //  stop the ball and destroy the brick
@@ -160,8 +178,8 @@ public:
         theBall->SetLinearVelocity(b2Vec2(0, 0));
         theBall->SetAngularVelocity(0);
         theBall->SetActive(false);
-        world->DestroyBody(theBrick);
-        theBrick = NULL;
+        world->DestroyBody(paddleLeft);
+        paddleLeft = NULL;
         ballHitBrick = false;
     }
 
@@ -197,8 +215,8 @@ public:
     auto *objPosList = new std::map<const char *,b2Vec2>;
     if (theBall)
         (*objPosList)["ball"] = theBall->GetPosition();
-    if (theBrick)
-        (*objPosList)["brick"] = theBrick->GetPosition();
+    if (paddleLeft)
+        (*objPosList)["brick"] = paddleLeft->GetPosition();
     return reinterpret_cast<void *>(objPosList);
 }
 
