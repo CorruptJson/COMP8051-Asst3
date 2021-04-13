@@ -39,7 +39,7 @@ enum
     GLuint programObject;
     std::chrono::time_point<std::chrono::steady_clock> lastTime;    // used to calculated elapsed time
 
-    GLuint brickVertexArray, ballVertexArray;   // vertex arrays for brick and ball
+    GLuint brickVertexArray, brick2VertexArray, ballVertexArray;   // vertex arrays for brick and ball
     int numBrickVerts, numBallVerts;
     GLKMatrix4 modelViewProjectionMatrix;   // model-view-projection matrix
 }
@@ -96,6 +96,7 @@ enum
     auto objPosList = static_cast<std::map<const char *, b2Vec2> *>([box2d GetObjectPositions]);
     b2Vec2 *theBall = (((*objPosList).find("ball") == (*objPosList).end()) ? nullptr : &(*objPosList)["ball"]);
     b2Vec2 *theBrick = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
+    b2Vec2 *theBrick2 = (((*objPosList).find("brick2") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick2"]);
 
     if (theBrick)
     {
@@ -132,6 +133,63 @@ enum
         numBrickVerts++;
         vertPos[k++] = theBrick->x - BRICK_WIDTH/2;
         vertPos[k++] = theBrick->y - BRICK_HEIGHT/2;
+        vertPos[k++] = 10;
+        numBrickVerts++;
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos), vertPos, GL_STATIC_DRAW);    // Send vertex data to VBO
+        glEnableVertexAttribArray(ATTRIB_POS);
+        glVertexAttribPointer(ATTRIB_POS, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), BUFFER_OFFSET(0));
+        
+        // VBO for vertex colours
+        GLfloat vertCol[numBrickVerts*3];
+        for (k=0; k<numBrickVerts*3; k+=3)
+        {
+            vertCol[k] = 1.0f;
+            vertCol[k+1] = 0.0f;
+            vertCol[k+2] = 0.0f;
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers[1]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertCol), vertCol, GL_STATIC_DRAW);    // Send vertex data to VBO
+        glEnableVertexAttribArray(ATTRIB_COL);
+        glVertexAttribPointer(ATTRIB_COL, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), BUFFER_OFFSET(0));
+
+        glBindVertexArray(0);
+    }
+    
+    if (theBrick2)
+    {
+        // Set up VAO/VBO for brick
+        glGenVertexArrays(1, &brick2VertexArray);
+        glBindVertexArray(brick2VertexArray);
+        GLuint vertexBuffers[2];
+        glGenBuffers(2, vertexBuffers);
+        
+        // VBO for vertex positions
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers[0]);
+        GLfloat vertPos[18];    // 2 triangles x 3 vertices/triangle x 3 coords (x,y,z) per vertex
+        int k = 0;
+        numBrickVerts = 0;
+        vertPos[k++] = theBrick2->x - BRICK_WIDTH/2;
+        vertPos[k++] = theBrick2->y + BRICK_HEIGHT/2;
+        vertPos[k++] = 10;  // z-value is always set to same value since 2D
+        numBrickVerts++;
+        vertPos[k++] = theBrick2->x + BRICK_WIDTH/2;
+        vertPos[k++] = theBrick2->y + BRICK_HEIGHT/2;
+        vertPos[k++] = 10;
+        numBrickVerts++;
+        vertPos[k++] = theBrick2->x + BRICK_WIDTH/2;
+        vertPos[k++] = theBrick2->y - BRICK_HEIGHT/2;
+        vertPos[k++] = 10;
+        numBrickVerts++;
+        vertPos[k++] = theBrick2->x - BRICK_WIDTH/2;
+        vertPos[k++] = theBrick2->y + BRICK_HEIGHT/2;
+        vertPos[k++] = 10;
+        numBrickVerts++;
+        vertPos[k++] = theBrick2->x + BRICK_WIDTH/2;
+        vertPos[k++] = theBrick2->y - BRICK_HEIGHT/2;
+        vertPos[k++] = 10;
+        numBrickVerts++;
+        vertPos[k++] = theBrick2->x - BRICK_WIDTH/2;
+        vertPos[k++] = theBrick2->y - BRICK_HEIGHT/2;
         vertPos[k++] = 10;
         numBrickVerts++;
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos), vertPos, GL_STATIC_DRAW);    // Send vertex data to VBO
@@ -220,6 +278,7 @@ enum
     auto objPosList = static_cast<std::map<const char *, b2Vec2> *>([box2d GetObjectPositions]);
     b2Vec2 *theBall = (((*objPosList).find("ball") == (*objPosList).end()) ? nullptr : &(*objPosList)["ball"]);
     b2Vec2 *theBrick = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
+    b2Vec2 *theBrick2 = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
 #ifdef LOG_TO_CONSOLE
     if (theBall)
         printf("Ball: (%5.3f,%5.3f)\t", theBall->x, theBall->y);
@@ -231,6 +290,10 @@ enum
     // Bind each vertex array and call glDrawArrays for each of the ball and brick
     glBindVertexArray(brickVertexArray);
     if (theBrick && numBrickVerts > 0)
+        glDrawArrays(GL_TRIANGLES, 0, numBrickVerts);
+    
+    glBindVertexArray(brick2VertexArray);
+    if (theBrick2 && numBrickVerts > 0)
         glDrawArrays(GL_TRIANGLES, 0, numBrickVerts);
 
     glBindVertexArray(ballVertexArray);

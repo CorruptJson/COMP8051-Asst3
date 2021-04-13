@@ -50,7 +50,7 @@ public:
     b2BodyDef *groundBodyDef;
     b2Body *groundBody;
     b2PolygonShape *groundBox;
-    b2Body *theBrick, *theBall;
+    b2Body *theBrick, *theBrick2, *theBall;
     CContactListener *contactListener;
     float totalElapsedTime;
 
@@ -82,7 +82,8 @@ public:
         // Set up the brick and ball objects for Box2D
         b2BodyDef brickBodyDef;
         brickBodyDef.type = b2_dynamicBody;
-        brickBodyDef.position.Set(BRICK_POS_X, BRICK_POS_Y);
+        brickBodyDef.position.Set(BRICK_POS_X, BRICK_POS_Y/2);
+        
         theBrick = world->CreateBody(&brickBodyDef);
         if (theBrick)
         {
@@ -101,6 +102,32 @@ public:
             ballBodyDef.type = b2_dynamicBody;
             ballBodyDef.position.Set(BALL_POS_X, BALL_POS_Y);
             theBall = world->CreateBody(&ballBodyDef);
+            
+            
+            b2BodyDef brickBodyDef2;
+            brickBodyDef2.type = b2_dynamicBody;
+            brickBodyDef2.position.Set(BRICK_POS_X, BRICK_POS_Y);
+            theBrick2 = world->CreateBody(&brickBodyDef2);
+            if (theBrick2)
+            {
+                theBrick2->SetUserData((__bridge void *)self);
+                theBrick2->SetAwake(false);
+                
+                b2PolygonShape dynamicBox2;
+                dynamicBox2.SetAsBox(BRICK_WIDTH/2, BRICK_HEIGHT/2);
+                b2FixtureDef fixtureDef2;
+                fixtureDef2.shape = &dynamicBox2;
+                fixtureDef2.density = 1.0f;
+                fixtureDef2.friction = 0.3f;
+                fixtureDef2.restitution = 1.0f;
+
+                theBrick2->CreateFixture(&fixtureDef2);
+                
+            }
+            
+            
+            
+            
             if (theBall)
             {
                 theBall->SetUserData((__bridge void *)self);
@@ -199,6 +226,8 @@ public:
         (*objPosList)["ball"] = theBall->GetPosition();
     if (theBrick)
         (*objPosList)["brick"] = theBrick->GetPosition();
+    if (theBrick2)
+        (*objPosList)["brick2"] = theBrick2->GetPosition();
     return reinterpret_cast<void *>(objPosList);
 }
 
