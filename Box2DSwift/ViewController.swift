@@ -10,6 +10,8 @@ extension ViewController: GLKViewControllerDelegate {
     }
 }
 
+
+
 class ViewController: GLKViewController {
     
     
@@ -34,6 +36,9 @@ class ViewController: GLKViewController {
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(self.doSingleTap(_:)))
         singleTap.numberOfTapsRequired = 1
         view.addGestureRecognizer(singleTap)
+        
+        let dragFinger = UIPanGestureRecognizer(target: self, action: #selector(self.doFingerDrag(_:)))
+        view.addGestureRecognizer(dragFinger)
     }
     
     override func glkView(_ view: GLKView, drawIn rect: CGRect) {
@@ -42,6 +47,24 @@ class ViewController: GLKViewController {
     
     @objc func doSingleTap(_ sender: UITapGestureRecognizer) {
         glesRenderer.box2d.launchBall()
+    }
+    
+    @IBAction func doFingerDrag(_ sender: UIPanGestureRecognizer){
+        let translation = sender.translation(in: view)
+
+         guard let senderView = sender.view else {
+           return
+         }
+
+        let newPoint = CGPoint(
+            x: senderView.center.x,
+            y: senderView.center.y + translation.y
+        )
+        
+        NSLog("PLEASE: %f", newPoint.y)
+
+         // 3
+        sender.setTranslation(.zero, in: view)
     }
 
 }
