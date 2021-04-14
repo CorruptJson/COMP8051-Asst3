@@ -271,7 +271,7 @@ public:
     float topVariable = theBrick->GetPosition().y;
     
     
-    theBrick->SetTransform(b2Vec2(BRICK_POS_X, topVariable - translation), 0.0);
+    theBrick->SetTransform(b2Vec2(BRICK_POS_X, MIN(MAX(topVariable - translation, 0), 600)), 0.0);
     
     //NSLog(@"MOVEPADDLE: %f", translation - topVariable);
 }
