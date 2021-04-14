@@ -278,7 +278,7 @@ enum
     auto objPosList = static_cast<std::map<const char *, b2Vec2> *>([box2d GetObjectPositions]);
     b2Vec2 *theBall = (((*objPosList).find("ball") == (*objPosList).end()) ? nullptr : &(*objPosList)["ball"]);
     b2Vec2 *theBrick = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
-    b2Vec2 *theBrick2 = (((*objPosList).find("brick") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick"]);
+    b2Vec2 *theBrick2 = (((*objPosList).find("brick2") == (*objPosList).end()) ? nullptr : &(*objPosList)["brick2"]);
 #ifdef LOG_TO_CONSOLE
     if (theBall)
         printf("Ball: (%5.3f,%5.3f)\t", theBall->x, theBall->y);

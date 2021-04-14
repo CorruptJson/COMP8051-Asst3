@@ -67,7 +67,7 @@ public:
     self = [super init];
     if (self) {
         // Initialize Box2D
-        gravity = new b2Vec2(0.0f, -10.0f);
+        gravity = new b2Vec2(0.0f, 0.0f);
         world = new b2World(*gravity);
         
         // For HelloWorld
@@ -82,7 +82,7 @@ public:
         // Set up the brick and ball objects for Box2D
         b2BodyDef brickBodyDef;
         brickBodyDef.type = b2_dynamicBody;
-        brickBodyDef.position.Set(BRICK_POS_X, BRICK_POS_Y/2);
+        brickBodyDef.position.Set(BRICK_POS_X, BRICK_POS_Y);
         
         theBrick = world->CreateBody(&brickBodyDef);
         if (theBrick)
@@ -97,6 +97,7 @@ public:
             fixtureDef.friction = 0.3f;
             fixtureDef.restitution = 1.0f;
             theBrick->CreateFixture(&fixtureDef);
+            theBrick->SetAwake(true);
             
             b2BodyDef ballBodyDef;
             ballBodyDef.type = b2_dynamicBody;
@@ -106,7 +107,7 @@ public:
             
             b2BodyDef brickBodyDef2;
             brickBodyDef2.type = b2_dynamicBody;
-            brickBodyDef2.position.Set(BRICK_POS_X, BRICK_POS_Y);
+            brickBodyDef2.position.Set(BRICK_POS_X + 800, BRICK_POS_Y);
             theBrick2 = world->CreateBody(&brickBodyDef2);
             if (theBrick2)
             {
@@ -122,6 +123,7 @@ public:
                 fixtureDef2.restitution = 1.0f;
 
                 theBrick2->CreateFixture(&fixtureDef2);
+                theBrick->SetAwake(true);
                 
             }
             
@@ -176,9 +178,7 @@ public:
     
     // Check if it is time yet to drop the brick, and if so
     //  call SetAwake()
-    totalElapsedTime += elapsedTime;
-    if ((totalElapsedTime > BRICK_WAIT) && theBrick)
-        theBrick->SetAwake(true);
+
     
     // If the last collision test was positive,
     //  stop the ball and destroy the brick
@@ -187,7 +187,7 @@ public:
         theBall->SetLinearVelocity(b2Vec2(0, 0));
         theBall->SetAngularVelocity(0);
         theBall->SetActive(false);
-        world->DestroyBody(theBrick);
+        //world->DestroyBody(theBrick);
         theBrick = NULL;
         ballHitBrick = false;
     }
