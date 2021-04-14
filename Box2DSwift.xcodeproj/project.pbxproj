@@ -675,6 +675,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Box2DSwift/Box2D",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = ca.btechgames.Box2DSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Box2DSwift/Box2DSwift-Bridging-Header.h";
@@ -699,6 +703,10 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Box2DSwift/Box2D",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = ca.btechgames.Box2DSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
