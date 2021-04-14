@@ -165,11 +165,19 @@ public:
 
 -(void)Update:(float)elapsedTime
 {
+    b2Vec2 pos = theBall->GetPosition();
+    b2Vec2 velocity = theBall->GetLinearVelocity();
+    
+    b2Vec2 brick2Pos = theBrick2->GetPosition();
+    
+    //Move AI slightly slower than the ball (to prevent jittering), but only up the the max speed.
+    float brick2Vel = MIN(ABS(velocity.y) - 5, 250);
+    
     // Check here if we need to launch the ball
     //  and if so, use ApplyLinearImpulse() and SetActive(true)
     if (ballLaunched)
     {
-        theBall->ApplyLinearImpulse(b2Vec2(-BALL_VELOCITY, 300000), theBall->GetPosition(), true);
+        theBall->ApplyLinearImpulse(b2Vec2(-BALL_VELOCITY, BALL_VELOCITY/1.5f), theBall->GetPosition(), true);
         theBall->SetActive(true);
 #ifdef LOG_TO_CONSOLE
         NSLog(@"Applying impulse %f to ball\n", BALL_VELOCITY);
@@ -177,26 +185,42 @@ public:
         ballLaunched = false;
     }
     
+    
+    // Screen Bounce
+    NSLog(@"yPos: %f", pos.y);
+    if (pos.y <= 0 && velocity.y < 0) {
+        theBall->SetLinearVelocity(b2Vec2(velocity.x, -velocity.y));
+    }
+    if (pos.y >= 600 && velocity.y > 0) {
+        theBall->SetLinearVelocity(b2Vec2(velocity.x, -velocity.y));
+    }
+    
     NSLog(@"BALLS VEL: %f", theBall->GetLinearVelocity().y);
     
-    // Check if it is time yet to drop the brick, and if so
-    //  call SetAwake()
 
-    
-    // If the last collision test was positive,
-    //  stop the ball and destroy the brick
+    // Make ball FASTER every hit
     if (ballHitBrick)
     {
-        
         ballHitBrick = false;
-        //theBall->SetLinearVelocity(theBall->GetLinearVelocity());
-        //theBall->SetLinearVelocity(b2Vec2(theBall->GetLinearVelocity().x * -1, theBall->GetLinearVelocity().y * -1));
-        //theBall->SetAngularVelocity(0);
-        //theBall->SetActive(false);
-        //world->DestroyBody(theBrick);
-        //theBrick = NULL;
+        theBall->SetLinearVelocity(b2Vec2(velocity.x * 1.1, velocity.y * 1.1));
     }
 
+
+    
+    
+    if(pos.y > brick2Pos.y) {
+        theBrick2->SetLinearVelocity(b2Vec2(0, brick2Vel));
+    }
+    else if (pos.y < brick2Pos.y){
+        theBrick2->SetLinearVelocity(b2Vec2(0, -brick2Vel));
+    } else {
+        theBrick2->SetLinearVelocity(b2Vec2(0, 0));
+    }
+    
+    
+    
+    
+    
     if (world)
     {
         while (elapsedTime >= MAX_TIMESTEP)
@@ -210,6 +234,9 @@ public:
             world->Step(elapsedTime, NUM_VEL_ITERATIONS, NUM_POS_ITERATIONS);
         }
     }
+    
+    
+    
 }
 
 -(void)RegisterHit
