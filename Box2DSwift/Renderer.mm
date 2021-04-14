@@ -143,9 +143,9 @@ enum
         GLfloat vertCol[numBrickVerts*3];
         for (k=0; k<numBrickVerts*3; k+=3)
         {
-            vertCol[k] = 1.0f;
+            vertCol[k] = 0.0f;
             vertCol[k+1] = 0.0f;
-            vertCol[k+2] = 0.0f;
+            vertCol[k+2] = 1.0f;
         }
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers[1]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertCol), vertCol, GL_STATIC_DRAW);    // Send vertex data to VBO
