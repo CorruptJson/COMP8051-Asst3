@@ -107,7 +107,7 @@ public:
             
             b2BodyDef brickBodyDef2;
             brickBodyDef2.type = b2_dynamicBody;
-            brickBodyDef2.position.Set(BRICK_POS_X + 800, BRICK_POS_Y);
+            brickBodyDef2.position.Set(BRICK_POS_X + 600, BRICK_POS_Y);
             theBrick2 = world->CreateBody(&brickBodyDef2);
             if (theBrick2)
             {
