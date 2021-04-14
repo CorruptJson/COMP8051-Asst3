@@ -55,13 +55,10 @@ class ViewController: GLKViewController {
          guard let senderView = sender.view else {
            return
          }
-
-        let newPoint = CGPoint(
-            x: senderView.center.x,
-            y: senderView.center.y + translation.y
-        )
         
-        NSLog("PLEASE: %f", newPoint.y)
+        //NSLog("PLEASE: %f", translation.y)
+        
+        glesRenderer.box2d.movePaddle(Float(translation.y))
 
          // 3
         sender.setTranslation(.zero, in: view)

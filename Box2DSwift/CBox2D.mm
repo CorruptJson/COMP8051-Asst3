@@ -95,7 +95,7 @@ public:
             b2FixtureDef fixtureDef;
             fixtureDef.shape = &dynamicBox;
             fixtureDef.density = 1.0f;
-            fixtureDef.friction = 0.3f;
+            fixtureDef.friction = 0.0f;
             fixtureDef.restitution = 1.0f;
             theBrick->CreateFixture(&fixtureDef);
             theBrick->SetAwake(true);
@@ -120,7 +120,7 @@ public:
                 b2FixtureDef fixtureDef2;
                 fixtureDef2.shape = &dynamicBox2;
                 fixtureDef2.density = 1.0f;
-                fixtureDef2.friction = 0.3f;
+                fixtureDef2.friction = 0.0f;
                 fixtureDef2.restitution = 1.0f;
 
                 theBrick2->CreateFixture(&fixtureDef2);
@@ -141,7 +141,7 @@ public:
                 b2FixtureDef circleFixtureDef;
                 circleFixtureDef.shape = &circle;
                 circleFixtureDef.density = 1.0f;
-                circleFixtureDef.friction = 0.3f;
+                circleFixtureDef.friction = 0.0f;
                 circleFixtureDef.restitution = 1.0f;
                 theBall->CreateFixture(&circleFixtureDef);
             }
@@ -169,13 +169,15 @@ public:
     //  and if so, use ApplyLinearImpulse() and SetActive(true)
     if (ballLaunched)
     {
-        theBall->ApplyLinearImpulse(b2Vec2(BALL_VELOCITY, 0), theBall->GetPosition(), true);
+        theBall->ApplyLinearImpulse(b2Vec2(-BALL_VELOCITY, 300000), theBall->GetPosition(), true);
         theBall->SetActive(true);
 #ifdef LOG_TO_CONSOLE
         NSLog(@"Applying impulse %f to ball\n", BALL_VELOCITY);
 #endif
         ballLaunched = false;
     }
+    
+    NSLog(@"BALLS VEL: %f", theBall->GetLinearVelocity().y);
     
     // Check if it is time yet to drop the brick, and if so
     //  call SetAwake()
@@ -220,6 +222,17 @@ public:
 {
     // Set some flag here for processing later...
     ballLaunched = true;
+}
+
+// Used to move player addle
+-(void)movePaddle: (float) translation
+{
+    float topVariable = theBrick->GetPosition().y;
+    
+    
+    theBrick->SetTransform(b2Vec2(BRICK_POS_X, topVariable - translation), 0.0);
+    
+    NSLog(@"MOVEPADDLE: %f", translation - topVariable);
 }
 
 -(void *)GetObjectPositions
