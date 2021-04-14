@@ -7,6 +7,19 @@ import GLKit
 extension ViewController: GLKViewControllerDelegate {
     func glkViewControllerUpdate(_ controller: GLKViewController) {
         glesRenderer.update()
+        
+        //NSLog("x: %f ", glesRenderer.box2d.getBallX())
+        // Player Lose
+        if(glesRenderer.box2d.getBallX() < 0 ) {
+            glesRenderer.box2d.resetGame()
+        }
+        // Player Win
+        if(glesRenderer.box2d.getBallX() > 800 ) {
+            glesRenderer.box2d.resetGame()
+        }
+        
+        
+        
     }
 }
 

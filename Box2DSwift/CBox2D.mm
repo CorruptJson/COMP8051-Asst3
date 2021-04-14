@@ -57,6 +57,7 @@ public:
     // You will also need some extra variables here for the logic
     bool ballHitBrick;
     bool ballLaunched;
+    bool gameStart;
 }
 @end
 
@@ -150,6 +151,7 @@ public:
         totalElapsedTime = 0;
         ballHitBrick = false;
         ballLaunched = false;
+        gameStart = false;
     }
     return self;
 }
@@ -175,19 +177,31 @@ public:
     
     // Check here if we need to launch the ball
     //  and if so, use ApplyLinearImpulse() and SetActive(true)
-    if (ballLaunched)
+    if (!gameStart && ballLaunched)
     {
-        theBall->ApplyLinearImpulse(b2Vec2(-BALL_VELOCITY, BALL_VELOCITY/1.5f), theBall->GetPosition(), true);
+        
+        // ball x speed -+ 20%
+        float ballXMod = (arc4random_uniform(40)) -20.0f;
+        
+        //ball y speed -+30%
+        float ballYMod = (arc4random_uniform(60)) -30.0f;
+        
+        //Up or down
+        
+        float ballDir = ((arc4random_uniform(2)) * 2.0f ) - 1.0f;
+        
+        NSLog(@"Start Ball %f", ballDir);
+        
+        theBall->ApplyLinearImpulse(b2Vec2(-BALL_VELOCITY * (1 + (ballXMod / 100)), BALL_VELOCITY * (1 + (ballYMod/100)) * ballDir ), theBall->GetPosition(), true);
         theBall->SetActive(true);
-#ifdef LOG_TO_CONSOLE
-        NSLog(@"Applying impulse %f to ball\n", BALL_VELOCITY);
-#endif
+
         ballLaunched = false;
+        gameStart = true;
     }
     
     
     // Screen Bounce
-    NSLog(@"yPos: %f", pos.y);
+    //NSLog(@"yPos: %f", pos.y);
     if (pos.y <= 0 && velocity.y < 0) {
         theBall->SetLinearVelocity(b2Vec2(velocity.x, -velocity.y));
     }
@@ -195,7 +209,7 @@ public:
         theBall->SetLinearVelocity(b2Vec2(velocity.x, -velocity.y));
     }
     
-    NSLog(@"BALLS VEL: %f", theBall->GetLinearVelocity().y);
+    //NSLog(@"BALLS VEL: %f", theBall->GetLinearVelocity().y);
     
 
     // Make ball FASTER every hit
@@ -245,6 +259,18 @@ public:
     ballHitBrick = true;
 }
 
+-(void)ResetGame
+{
+    theBall->SetAwake(false);
+    theBall->SetLinearVelocity(b2Vec2(0,0));
+    theBall->SetTransform(b2Vec2(BALL_POS_X, BALL_POS_Y), 0);
+    theBrick->SetTransform(b2Vec2(BRICK_POS_X, BRICK_POS_Y), 0);
+    theBrick2->SetTransform(b2Vec2(BRICK_POS_X + 600, BRICK_POS_Y), 0);
+    
+    ballLaunched = false;
+    gameStart = false;
+}
+
 -(void)LaunchBall
 {
     // Set some flag here for processing later...
@@ -272,6 +298,11 @@ public:
     if (theBrick2)
         (*objPosList)["brick2"] = theBrick2->GetPosition();
     return reinterpret_cast<void *>(objPosList);
+}
+
+
+-(float)GetBallX {
+    return theBall->GetPosition().x;
 }
 
 
