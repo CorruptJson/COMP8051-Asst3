@@ -13,10 +13,14 @@ extension ViewController: GLKViewControllerDelegate {
         // Player Lose
         if(glesRenderer.box2d.getBallX() < 0 ) {
             glesRenderer.box2d.resetGame()
+            AIScoreCount+=1
+            AIScore.text = String(AIScoreCount)
         }
         // Player Win
         if(glesRenderer.box2d.getBallX() > 800 ) {
             glesRenderer.box2d.resetGame()
+            playerScoreCount+=1
+            playerScore.text = String(playerScoreCount)
         }
         
         
@@ -31,6 +35,8 @@ class ViewController: GLKViewController {
     private var glesRenderer: Renderer!
     private var playerScore: UILabel!
     private var AIScore: UILabel!
+    private var playerScoreCount = 0
+    private var AIScoreCount = 0
     
     private func setupGL() {
         context = EAGLContext(api: .openGLES3)
@@ -50,7 +56,7 @@ class ViewController: GLKViewController {
         // LABELS
         playerScore = UILabel.init()
         playerScore.frame = CGRect(x:(self.view.frame.width/2)-50, y:0, width:50, height:50)
-        playerScore.text = "0"
+        playerScore.text = String(playerScoreCount)
         playerScore.textAlignment = NSTextAlignment.center
         playerScore.font = playerScore.font.withSize(40)
         playerScore.textColor = UIColor.blue
@@ -58,7 +64,7 @@ class ViewController: GLKViewController {
         
         AIScore = UILabel.init()
         AIScore.frame = CGRect(x:self.view.frame.width/2, y:0, width:50, height:50)
-        AIScore.text = "0"
+        AIScore.text = String(AIScoreCount)
         AIScore.textAlignment = NSTextAlignment.center
         AIScore.font = AIScore.font.withSize(40)
         AIScore.textColor = UIColor.red

@@ -273,7 +273,7 @@ public:
     
     theBrick->SetTransform(b2Vec2(BRICK_POS_X, topVariable - translation), 0.0);
     
-    NSLog(@"MOVEPADDLE: %f", translation - topVariable);
+    //NSLog(@"MOVEPADDLE: %f", translation - topVariable);
 }
 
 -(void *)GetObjectPositions
