@@ -32,8 +32,6 @@ public:
             // Use contact->GetFixtureA()->GetBody() to get the body
             b2Body* bodyA = contact->GetFixtureA()->GetBody();
             CBox2D *parentObj = (__bridge CBox2D *)(bodyA->GetUserData());
-            // Call RegisterHit (assume CBox2D object is in user data)
-            [parentObj RegisterHit];    // assumes RegisterHit is a callback function to register collision
         }
     }
     void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {};
@@ -55,7 +53,7 @@ public:
     float totalElapsedTime;
 
     // You will also need some extra variables here for the logic
-    bool ballHitBrick;
+
     bool ballLaunched;
     bool gameStart;
 }
@@ -143,13 +141,12 @@ public:
                 circleFixtureDef.shape = &circle;
                 circleFixtureDef.density = 1.0f;
                 circleFixtureDef.friction = 0.0f;
-                circleFixtureDef.restitution = 1.0f;
+                circleFixtureDef.restitution = 1.2f;
                 theBall->CreateFixture(&circleFixtureDef);
             }
         }
         
         totalElapsedTime = 0;
-        ballHitBrick = false;
         ballLaunched = false;
         gameStart = false;
     }
@@ -212,12 +209,7 @@ public:
     //NSLog(@"BALLS VEL: %f", theBall->GetLinearVelocity().y);
     
 
-    // Make ball FASTER every hit
-    if (ballHitBrick)
-    {
-        ballHitBrick = false;
-        theBall->SetLinearVelocity(b2Vec2(velocity.x * 1.1, velocity.y * 1.1));
-    }
+
 
 
     
@@ -253,11 +245,7 @@ public:
     
 }
 
--(void)RegisterHit
-{
-    // Set some flag here for processing later...
-    ballHitBrick = true;
-}
+
 
 -(void)ResetGame
 {
