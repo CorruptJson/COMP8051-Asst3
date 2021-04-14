@@ -222,6 +222,17 @@ public:
     ballLaunched = true;
 }
 
+// Used to move player addle
+-(void)movePaddle: (float) translation
+{
+    float topVariable = theBrick->GetPosition().y;
+    
+    
+    theBrick->SetTransform(b2Vec2(BRICK_POS_X, topVariable - translation), 0.0);
+    
+    NSLog(@"MOVEPADDLE: %f", translation - topVariable);
+}
+
 -(void *)GetObjectPositions
 {
     auto *objPosList = new std::map<const char *,b2Vec2>;
