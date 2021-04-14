@@ -3,6 +3,7 @@
 //
 
 import GLKit
+import UIKit
 
 extension ViewController: GLKViewControllerDelegate {
     func glkViewControllerUpdate(_ controller: GLKViewController) {
@@ -10,13 +11,13 @@ extension ViewController: GLKViewControllerDelegate {
     }
 }
 
-
-
 class ViewController: GLKViewController {
     
     
     private var context: EAGLContext?
     private var glesRenderer: Renderer!
+    private var playerScore: UILabel!
+    private var AIScore: UILabel!
     
     private func setupGL() {
         context = EAGLContext(api: .openGLES3)
@@ -32,6 +33,25 @@ class ViewController: GLKViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // LABELS
+        playerScore = UILabel.init()
+        playerScore.frame = CGRect(x:(self.view.frame.width/2)-50, y:0, width:50, height:50)
+        playerScore.text = "0"
+        playerScore.textAlignment = NSTextAlignment.center
+        playerScore.font = playerScore.font.withSize(40)
+        playerScore.textColor = UIColor.blue
+        self.view.addSubview(playerScore)
+        
+        AIScore = UILabel.init()
+        AIScore.frame = CGRect(x:self.view.frame.width/2, y:0, width:50, height:50)
+        AIScore.text = "0"
+        AIScore.textAlignment = NSTextAlignment.center
+        AIScore.font = AIScore.font.withSize(40)
+        AIScore.textColor = UIColor.red
+        self.view.addSubview(AIScore)
+        
+        
         setupGL()
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(self.doSingleTap(_:)))
         singleTap.numberOfTapsRequired = 1
@@ -63,5 +83,4 @@ class ViewController: GLKViewController {
          // 3
         sender.setTranslation(.zero, in: view)
     }
-
 }
