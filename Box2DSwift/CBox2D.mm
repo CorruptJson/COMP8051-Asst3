@@ -89,6 +89,7 @@ public:
         {
             theBrick->SetUserData((__bridge void *)self);
             theBrick->SetAwake(false);
+            theBrick->SetType(b2_kinematicBody);
             b2PolygonShape dynamicBox;
             dynamicBox.SetAsBox(BRICK_WIDTH/2, BRICK_HEIGHT/2);
             b2FixtureDef fixtureDef;
@@ -113,7 +114,7 @@ public:
             {
                 theBrick2->SetUserData((__bridge void *)self);
                 theBrick2->SetAwake(false);
-                
+                theBrick2->SetType(b2_kinematicBody);
                 b2PolygonShape dynamicBox2;
                 dynamicBox2.SetAsBox(BRICK_WIDTH/2, BRICK_HEIGHT/2);
                 b2FixtureDef fixtureDef2;
@@ -168,7 +169,7 @@ public:
     //  and if so, use ApplyLinearImpulse() and SetActive(true)
     if (ballLaunched)
     {
-        theBall->ApplyLinearImpulse(b2Vec2(0, BALL_VELOCITY), theBall->GetPosition(), true);
+        theBall->ApplyLinearImpulse(b2Vec2(BALL_VELOCITY, 0), theBall->GetPosition(), true);
         theBall->SetActive(true);
 #ifdef LOG_TO_CONSOLE
         NSLog(@"Applying impulse %f to ball\n", BALL_VELOCITY);
@@ -184,12 +185,14 @@ public:
     //  stop the ball and destroy the brick
     if (ballHitBrick)
     {
-        theBall->SetLinearVelocity(b2Vec2(0, 0));
-        theBall->SetAngularVelocity(0);
-        theBall->SetActive(false);
-        //world->DestroyBody(theBrick);
-        theBrick = NULL;
+        
         ballHitBrick = false;
+        //theBall->SetLinearVelocity(theBall->GetLinearVelocity());
+        //theBall->SetLinearVelocity(b2Vec2(theBall->GetLinearVelocity().x * -1, theBall->GetLinearVelocity().y * -1));
+        //theBall->SetAngularVelocity(0);
+        //theBall->SetActive(false);
+        //world->DestroyBody(theBrick);
+        //theBrick = NULL;
     }
 
     if (world)
